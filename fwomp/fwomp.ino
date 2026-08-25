@@ -1,7 +1,6 @@
 #include "Arduino.h"
 
-
-
+//////////////// Varaibles
 String code = "";
 int count = 0;
 bool on = false;
@@ -25,6 +24,7 @@ const int onLed = A0;
 int onPrevState = LOW;
 
 
+//////////////// Initate buttons and lights
 void setup() {
   pinMode(rightButton, INPUT);
   pinMode(leftButton, INPUT);
@@ -48,33 +48,34 @@ void setup() {
   digitalWrite(onLed, LOW);
 }
 
+//////////////// the main thingy that runs over and over
 void loop() {
   int upState = digitalRead(upButton);
-  int downState = digitalRead(downButton);
+  int downState = digitalRead(downButton);    // getting the state of the button aka if it is pressed down or not
   int rightState = digitalRead(rightButton);
   int leftState = digitalRead(leftButton);
   int onState = digitalRead(onButton);
   bool left = false;
-  bool right = false;
+  bool right = false;   // this is for the lights to help keep track of which should be on and which shouldn't
   bool up = false;
   bool down = false;
 
 
 
-  if (onState == HIGH && onPrevState == LOW) {
+  if (onState == HIGH && onPrevState == LOW) { // checks if the button was pressed this frame (actually checks if we let go of the button, but it doenst matter really :p )
     on = !on;
   }
   if (on) {
     digitalWrite(onLed, HIGH);
-    if (!locked) {
+    if (!locked) {  // just makes sure you can only press the button when no code has been activated
       if (upState == HIGH && upPrevState == LOW) {
       up = true;
-      code += "w";
+      code += "s";
       count++;
       }
       if (downState == HIGH && downPrevState == LOW) {
         down = true;
-        code += "s";
+        code += "w";
         count++;
       }
       if (leftState == HIGH && leftPrevState == LOW) {
@@ -92,22 +93,22 @@ void loop() {
   } else {
     digitalWrite(onLed, LOW);
     up = false;
-    down = false;
+    down = false;   // resets stuff when the powerbutton on the box is turned off
     left = false;
     right = false;
     count = 0;
     code = "";
     locked = false;
   }
-  if(code == "wdsss" || code == "wssws"|| code == "adwsd"|| code == "wwssd"|| code == "sssss"|| code == "wwwww"|| code == "wwssadad"|| code == "sads"|| code == "dwssw")  {
-    locked = true;
+  if(code == "wdsss" || code == "wssws"|| code == "adwsd"|| code == "wwssd"|| code == "sssss"|| code == "wwwww"|| code == "wwssadad"|| code == "sads"|| code == "dwssw" ||code == "adad"||code == "dad"||code == "wasdwasdwasdwasdwasdwasdwasdwasdwasdwasdwasdwasdwasd" ||code == "dsdsdsds")  {
+    locked = true;  // the bread and butter, it checks if an active code has been typed and then turns on the lights and locks the input exept power button.
     up = true;
     down = true;
     left = true;
     right = true;
   } 
   if (up) {
-    digitalWrite(upLed,HIGH);
+    digitalWrite(upLed,HIGH);   //the functional parts of the lights
   } else {
     digitalWrite(upLed,LOW);
   }
@@ -126,8 +127,9 @@ void loop() {
   } else {
     digitalWrite(rightLed,LOW);
   }
+  Serial.print(code + "\n");
   onPrevState = onState;
-  upPrevState = upState;
+  upPrevState = upState;      // sets the previous states so they are ready for next frame
   downPrevState = downState;
   leftPrevState = leftState;
   rightPrevState = rightState;
